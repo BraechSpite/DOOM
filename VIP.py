@@ -1,8 +1,17 @@
+from flask import Flask
+from threading import Thread
 import re
 from datetime import datetime
 from telethon import TelegramClient, events
 from telethon.errors import FloodWaitError, UserNotParticipantError
 import asyncio
+app = Flask(__name__)
+@app.route('/')
+def index():
+    return 'Server is running!'
+def run_flask():
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
 
 api_id = 23844616
 api_hash = '4aeca3680a20f9b8bc669f9897d5402f'
@@ -187,6 +196,10 @@ async def clear_command_handler(event):
     except Exception as e:
         print(f"Unexpected error in clear command: {str(e)}")  # Log unexpected errors
         await event.respond("An unexpected error occurred while clearing the trade results.")
+
+flask_thread = Thread(target=run_flask)
+flask_thread.daemon = True
+flask_thread.start()
 
 # Start the bot
 print("Bot is running...")
