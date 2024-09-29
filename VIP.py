@@ -1,6 +1,7 @@
 from flask import Flask
 from threading import Thread
 import re
+import os
 from datetime import datetime
 from telethon import TelegramClient, events
 from telethon.errors import FloodWaitError, UserNotParticipantError
@@ -12,6 +13,7 @@ def index():
 def run_flask():
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
+
 
 api_id = 23844616
 api_hash = '4aeca3680a20f9b8bc669f9897d5402f'
@@ -26,21 +28,21 @@ trade_results = []
 # Dictionary to map currency pairs to flags
 currency_flags = {
     'AUDUSD': '🇦🇺🇺🇸',
-'USDINR': '🇺🇸🇮🇳',
-'USDINR': '🇺🇸🇮🇳',
-'USD/EGP': '🇺🇸🇪🇬',
-'EURUSD': '🇪🇺🇺🇸',
-'GBP/NZD': '🇬🇧🇳🇿',
-'USDJPY': '🇺🇸🇯🇵',
-'USD/PKR': '🇺🇸🇵🇰',
-'USD/BRL': '🇺🇸🇧🇷',
-'AUD/NZD': '🇦🇺🇳🇿',
-'EURCAD': '🇪🇺🇨🇦',
-'EURJPY': '🇪🇺🇯🇵',
-'GBPJPY': '🇬🇧🇯🇵',
-'USD/BDT': '🇺🇸🇧🇩',
-'EURSGD': '🇪🇺🇸🇬',
-'GBPCAD': '🇬🇧🇨🇦',
+    'USDINR': '🇺🇸🇮🇳',
+    'USDINR': '🇺🇸🇮🇳',
+    'USD/EGP': '🇺🇸🇪🇬',
+    'EURUSD': '🇪🇺🇺🇸',
+    'GBP/NZD': '🇬🇧🇳🇿',
+    'USDJPY': '🇺🇸🇯🇵',
+    'USD/PKR': '🇺🇸🇵🇰',
+    'USD/BRL': '🇺🇸🇧🇷',
+    'AUD/NZD': '🇦🇺🇳🇿',
+    'EURCAD': '🇪🇺🇨🇦',
+    'EURJPY': '🇪🇺🇯🇵',
+    'GBPJPY': '🇬🇧🇯🇵',
+    'USD/BDT': '🇺🇸🇧🇩',
+    'EURSGD': '🇪🇺🇸🇬',
+    'GBPCAD': '🇬🇧🇨🇦',
 'EURAUD': '🇪🇺🇦🇺',
 'USDCAD': '🇺🇸🇨🇦',
 'GBPCHF': '🇬🇧🇨🇭',
@@ -196,11 +198,34 @@ async def clear_command_handler(event):
     except Exception as e:
         print(f"Unexpected error in clear command: {str(e)}")  # Log unexpected errors
         await event.respond("An unexpected error occurred while clearing the trade results.")
+ # Event handler for /clear command
+@client.on(events.NewMessage(pattern='/clear'))
+async def clear_command_handler(event):
+    try:
+        trade_results.clear()  # Clear the trade results
+        await event.respond("Trade results cleared! You can now start a new session.")
+    except Exception as e:
+        print(f"Unexpected error in clear command: {str(e)}")  # Log unexpected errors
+        await event.respond("An unexpected error occurred while clearing the trade results.")
+     # Event handler for /clear command
+@client.on(events.NewMessage(pattern='/clear'))
+# Event handler for /clear command
+@client.on(events.NewMessage(pattern='/clear'))
+async def clear_command_handler(event):
+    try:
+        trade_results.clear()  # Clear the trade results
+        await event.respond("Trade results cleared! You can now start a new session.")
+    except Exception as e:
+        print(f"Unexpected error in clear command: {str(e)}")  # Log unexpected errors
+        await event.respond("An unexpected error occurred while clearing the trade results.")
 
+
+# Start Flask server in a separate thread
 flask_thread = Thread(target=run_flask)
 flask_thread.daemon = True
 flask_thread.start()
 
-# Start the bot
-print("Bot is running...")
-client.run_until_disconnected()
+if __name__ == '__main__':
+    # Start the bot
+    print("Bot is running...")
+    client.run_until_disconnected()
